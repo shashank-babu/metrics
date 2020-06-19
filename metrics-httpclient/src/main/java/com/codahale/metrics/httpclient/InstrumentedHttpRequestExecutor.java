@@ -41,22 +41,25 @@ public class InstrumentedHttpRequestExecutor extends HttpRequestExecutor {
 
     @Override
     public HttpResponse execute(HttpRequest request, HttpClientConnection conn, HttpContext context) throws HttpException, IOException {
-        final Timer.Context timerContext = timer(request).time();
-        try {
-            return super.execute(request, conn, context);
+        try(Timer.Context timerContext = requestTimer(request).time()) {
+            HttpResponse response = super.execute(request, conn, context);
+            responseMeter(request, response);
+            return  response;
         } catch (HttpException | IOException e) {
             meter(e).mark();
             throw e;
-        } finally {
-            timerContext.stop();
         }
     }
 
-    private Timer timer(HttpRequest request) {
-        return registry.timer(metricNameStrategy.getNameFor(name, request));
+    private Timer requestTimer(HttpRequest request) {
+        return registry.timer(metricNameStrategy.getRequestName(name, request));
     }
 
     private Meter meter(Exception e) {
         return registry.meter(metricNameStrategy.getNameFor(name, e));
+    }
+
+    private Meter responseMeter(HttpRequest httpRequest, HttpResponse httpResponse) {
+        return registry.meter(metricNameStrategy.getResponseName(name, httpRequest, httpResponse));
     }
 }

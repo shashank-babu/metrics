@@ -22,25 +22,25 @@ public class HttpClientMetricNameStrategiesTest {
 
     @Test
     public void methodOnlyWithName() {
-        assertThat(METHOD_ONLY.getNameFor("some-service", new HttpGet("/whatever")),
+        assertThat(METHOD_ONLY.getRequestName("some-service", new HttpGet("/whatever")),
                 is("org.apache.http.client.HttpClient.some-service.get-requests"));
     }
 
     @Test
     public void methodOnlyWithoutName() {
-        assertThat(METHOD_ONLY.getNameFor(null, new HttpGet("/whatever")),
+        assertThat(METHOD_ONLY.getRequestName(null, new HttpGet("/whatever")),
                 is("org.apache.http.client.HttpClient.get-requests"));
     }
 
     @Test
     public void hostAndMethodWithName() {
-        assertThat(HOST_AND_METHOD.getNameFor("some-service", new HttpPost("http://my.host.com/whatever")),
+        assertThat(HOST_AND_METHOD.getRequestName("some-service", new HttpPost("http://my.host.com/whatever")),
                 is("org.apache.http.client.HttpClient.some-service.my.host.com.post-requests"));
     }
 
     @Test
     public void hostAndMethodWithoutName() {
-        assertThat(HOST_AND_METHOD.getNameFor(null, new HttpPost("http://my.host.com/whatever")),
+        assertThat(HOST_AND_METHOD.getRequestName(null, new HttpPost("http://my.host.com/whatever")),
                 is("org.apache.http.client.HttpClient.my.host.com.post-requests"));
     }
 
